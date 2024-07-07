@@ -36,6 +36,7 @@ jobs:
           repository: tianocore/edk2
           ref: ${{ env.REF }}
           path: main
+          submodules: recursive
 
       - name: Build
         shell: bash
