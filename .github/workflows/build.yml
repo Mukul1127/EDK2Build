@@ -2,12 +2,6 @@ name: Build OVMF
 
 on:
   workflow_dispatch:
-    inputs:
-      decrypted_youtube_url:
-        description: "The *decrypted* YouTube ipa (Provide Direct Download Link)."
-        default: ""
-        required: true
-        type: string
 
 jobs:
   build:
