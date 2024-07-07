@@ -7,14 +7,24 @@ jobs:
   build:
     name: Build OVMF
     runs-on: ubuntu-latest
-    container: archlinux:latest
     permissions:
       contents: write    
       
     steps:
       - name: Install Dependencies and Update System
         run: |
-          sudo pacman -Syu nasm git acpica python
+          curl -s https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor | sudo tee -a /usr/share/keyrings/llvm-archive-keyring.gpg
+          
+          echo "Types: deb"                                              | sudo tee -a /etc/apt/sources.list.d/llvm.sources
+          echo "URIs: http://apt.llvm.org/noble/"                        | sudo tee -a /etc/apt/sources.list.d/llvm.sources
+          echo "Suites: llvm-toolchain-noble"                            | sudo tee -a /etc/apt/sources.list.d/llvm.sources
+          echo "Components: main"                                        | sudo tee -a /etc/apt/sources.list.d/llvm.sources
+          echo "Signed-By: /usr/share/keyrings/llvm-archive-keyring.gpg" | sudo tee -a /etc/apt/sources.list.d/llvm.sources
+          
+          sudo apt update
+          sudo apt upgrade
+          
+          sudo apt install uuid-dev acpica-tools nasm clang-format clang-tidy clang-tools clang clangd libc++-dev libc++1 libc++abi-dev libc++abi1 libclang-dev libclang1 libllvm-ocaml-dev libomp-dev libomp5 lld llvm-dev llvm-runtime llvm python3-clang
 
       - name: Get Latest EDK-II Release
         run: |
