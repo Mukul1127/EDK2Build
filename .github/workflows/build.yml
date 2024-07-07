@@ -1,0 +1,47 @@
+name: Build OVMF
+
+on:
+  workflow_dispatch:
+    inputs:
+      decrypted_youtube_url:
+        description: "The *decrypted* YouTube ipa (Provide Direct Download Link)."
+        default: ""
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Build OVMF
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      THEOS: ${{ github.workspace }}/theos
+
+    steps:
+      - name: Get Latest EDK-II Release
+        run: |
+          echo "REF=$(curl -s https://api.github.com/repos/tianocore/edk2/releases/latest | jq -r .tag_name)" >> $GITHUB_ENV
+
+      - name: Update System and Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt upgrade
+          sudo apt install uuid-dev iasl nasm python-is-python3
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4.1.7
+        with:
+          repository: tianocore/edk2
+          ref: ${{ env.REF }}
+          path: main
+          submodules: recursive
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2.0.6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.REF }}-${{ github.run_number }}
+          name: ${{ env.REF }}-${{ github.run_number }}
+          files: main/packages/*.ipa
