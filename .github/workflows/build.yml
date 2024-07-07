@@ -41,19 +41,23 @@ jobs:
       - name: Setup Build Environment
         working-directory: ${{ github.workspace }}/main
         run: |
+          git submodule update --init --recursive
+          
           echo "*venv*/**" >> .git/info/exclude
           
           python -m venv .venv
           source .venv/bin/activate
 
-          python BaseTools/Edk2ToolsBuild.py -t CLANGPDB
+          pip install -r pip-requirements.txt --upgrade
 
-          stuart_update -c .pytool/CISettings.py -a X64 -t CLANGPDB
+          python BaseTools/Edk2ToolsBuild.py -t CLANGPDB
 
       - name: Build
         working-directory: ${{ github.workspace }}/main
         run: |
-          stuart_ci_build -c .pytool/CISettings.py Target=RELEASE TOOL_CHAIN_TAG=CLANGPDB -p OvmfPkg/OvmfPkgX64.dsc -a X64 -t CLANGPDB
+          stuart_setup -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANGPDB BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
+          stuart_update -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANGPDB BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
+          stuart_build -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANGPDB BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
 
       - name: Create Release
         uses: softprops/action-gh-release@v2.0.6
