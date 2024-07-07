@@ -7,24 +7,13 @@ jobs:
   build:
     name: Build OVMF
     runs-on: ubuntu-latest
-    container: archlinux:latest
     permissions:
-      contents: write
-
+      contents: write    
+      
     steps:
       - name: Install Dependencies and Update System
         run: |
-          pacman -Syu --noconfirm
-          pacman-key --init
-          
-          pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
-          pacman-key --lsign-key 3056513887B78AEB
-          pacman -U "https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst" --noconfirm
-          pacman -U "https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst" --noconfirm
-          echo "[chaotic-aur]"                              >> /etc/pacman.conf
-          echo "Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
-          
-          pacman -Syu jq git nasm acpica python make llvm-git lldb-git lld-git polly-git compiler-rt-git clang-git llvm-libs-git --noconfirm
+          sudo apt install uuid-dev acpica-tools nasm
 
       - name: Get Latest EDK-II Release
         run: |
@@ -39,26 +28,22 @@ jobs:
           submodules: recursive
 
       - name: Build
-        shell: bash
         working-directory: ${{ github.workspace }}/main
         run: |
-          make -C BaseTools
-          source edksetup.sh
+          python -m venv .venv
+          source .venv/bin/activate
 
-          echo "EDK_TOOLS_PATH=${{ github.workspace }}/main/BaseTools" >> $GITHUB_ENV
+          pip install -r pip-requirements.txt --upgrade
 
-          make -C edk2/BaseTools
-          source edksetup.sh BaseTools
-
-          sed -i "" "s|Nt32Pkg/Nt32Pkg.dsc|OvmfPkg/OvmfPkgX64.dsc|g" Conf/target.txt
-          sed -i "" "s|MYTOOLS|CLANGDWARF|g" Conf/target.txt
-          sed -i "" "s|IA32|X64|g" Conf/target.txt
+          python BaseTools/Edk2ToolsBuild.py -t GCC
           
-          build -p OvmfPkg/OvmfPkgX64.dsc -b RELEASE -a X64 -t CLANGDWARF -D TPM_ENABLE -D TPM_CONFIG_ENABLE -D SECURE_BOOT_ENABLE -D NETWORK_TLS_ENABLE
+          stuart_setup -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=GCC BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
+          stuart_update -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=GCC BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
+          stuart_build -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=GCC BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
 
       - name: Create Release
         uses: softprops/action-gh-release@v2.0.6
         with:
           tag_name: ${{ env.REF }}-run${{ github.run_number }}
           name: ${{ env.REF }}-run${{ github.run_number }}
-          files: ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/FV/*
+          files: ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_GCC/FV/*
