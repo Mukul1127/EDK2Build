@@ -36,15 +36,16 @@ jobs:
       - name: Setup Dependencies
         working-directory: ${{ github.workspace }}/main
         run: |
-          python -m venv venv
-          venv/bin/activate
+          python -m venv .venv
+          source .venv/bin/activate
           pip install -r pip-requirements.txt --upgrade
           python BaseTools/Edk2ToolsBuild.py -t "${toolchain}"
 
       - name: Build OVMF
         working-directory: ${{ github.workspace }}/main
         run: |
-          venv/bin/activate && stuart_setup ${stuart_opts} && stuart_update ${stuart_opts} && stuart_build ${stuart_opts}
+          source .venv/bin/activate
+          stuart_setup ${stuart_opts} && stuart_update ${stuart_opts} && stuart_build ${stuart_opts}
 
       - name: Create Release .tar.xz
         working-directory: ${{ github.workspace }}
