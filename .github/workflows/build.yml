@@ -9,7 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     container: archlinux:latest
     permissions:
-      contents: write    
+      contents: write
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ github.workspace }}/main
+
       
     steps:
       - name: Install Dependencies and Update System
@@ -36,19 +41,15 @@ jobs:
           repository: tianocore/edk2
           ref: ${{ env.REF }}
           path: main
-          submodules: recursive
 
       - name: Build
-        working-directory: ${{ github.workspace }}/main
         run: |
           make -C BaseTools
-          cd ${{ github.workspace }}/main
           source edksetup.sh
 
           echo "EDK_TOOLS_PATH=${{ github.workspace }}/main/BaseTools" >> $GITHUB_ENV
 
           make -C edk2/BaseTools
-          cd ${{ github.workspace }}/main
           source edksetup.sh BaseTools
 
           sed -i "" "s|Nt32Pkg/Nt32Pkg.dsc|OvmfPkg/OvmfPkgX64.dsc|g" Conf/target.txt
