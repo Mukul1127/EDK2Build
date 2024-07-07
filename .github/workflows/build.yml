@@ -17,9 +17,9 @@ jobs:
     steps:
       - name: Installing Dependencies and Updating System
         run: |
-          curl -s https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee -a /apt.llvm.org.asc
+          curl -s https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor | sudo tee -a /usr/share/keyrings/llvm-archive-keyring.gpg
 
-          echo "deb http://apt.llvm.org/noble/ llvm-toolchain-noble main" | sudo tee -a /etc/apt/sources.list.d/llvm.list
+          echo "deb [signed-by=/usr/share/keyrings/llvm-archive-keyring.gpg] http://apt.llvm.org/noble/ llvm-toolchain-noble main" | sudo tee -a /etc/apt/sources.list.d/llvm.list
           
           sudo apt update
           sudo apt upgrade
