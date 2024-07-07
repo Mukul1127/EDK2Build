@@ -16,7 +16,9 @@ jobs:
     permissions:
       contents: write
     env:
-      THEOS: ${{ github.workspace }}/theos
+      TOOLCHAIN: CLANG9
+      build_target: RELEASE
+      stuart_opts: -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANG9 BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
 
     steps:
       - name: Get Latest EDK-II Release
@@ -37,11 +39,36 @@ jobs:
           path: main
           submodules: recursive
 
+      - name: Setup Dependencies
+        working-directory: ${{ github.workspace }}/main
+        run: |
+          python -m venv venv
+          venv/bin/activate
+          pip install -r pip-requirements.txt --upgrade
+          python BaseTools/Edk2ToolsBuild.py -t "${toolchain}"
+
+      - name: Build OVMF
+        working-directory: ${{ github.workspace }}/main
+        run: |
+          venv/bin/activate && stuart_setup ${stuart_opts} && stuart_update ${stuart_opts} && stuart_build ${stuart_opts}
+
+      - name: Create Release .tar.xz
+        working-directory: ${{ github.workspace }}
+        run: |
+          mkdir package
+          
+          cp main/Build/OvmfX64/RELEASE_CLANG9/FV/OVMF_CODE.fd package/
+          cp main/Build/OvmfX64/RELEASE_CLANG9/FV/OVMF_VARS.fd package/
+          cp main/Build/OvmfX64/RELEASE_CLANG9/X64/Shell.efi package/
+
+          tar cf package.tar package/
+          xz package.tar
+
       - name: Create Release
         uses: softprops/action-gh-release@v2.0.6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.REF }}-${{ github.run_number }}
-          name: ${{ env.REF }}-${{ github.run_number }}
-          files: main/packages/*.ipa
+          tag_name: ${{ env.REF }}-run${{ github.run_number }}
+          name: ${{ env.REF }}-run${{ github.run_number }}
+          files: ${{ github.workspace }}/package.tar.xz
