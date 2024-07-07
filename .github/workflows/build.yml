@@ -9,12 +9,16 @@ jobs:
     runs-on: ubuntu-latest
     container: archlinux:latest
     permissions:
-      contents: write
+      contents: write    
       
     steps:
       - name: Install Dependencies and Update System
         run: |
           sudo pacman -Syu nasm git acpica python
+
+      - name: Get Latest EDK-II Release
+        run: |
+          echo "REF=$(curl -s https://api.github.com/repos/tianocore/edk2/releases/latest | jq -r .tag_name)" >> $GITHUB_ENV
 
       - name: Checkout Repository
         uses: actions/checkout@v4.1.7
@@ -32,17 +36,15 @@ jobs:
 
           pip install -r pip-requirements.txt --upgrade
 
-          python BaseTools/Edk2ToolsBuild.py -t GCC5
+          make -C -j $(nproc) BaseTools
           
-          stuart_setup -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=GCC5 BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
-          stuart_update -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=GCC5 BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
-          stuart_build -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=GCC5 BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
+          stuart_setup -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANGDWARF BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
+          stuart_update -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANGDWARF BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
+          stuart_build -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANGDWARF BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
 
       - name: Create Release
         uses: softprops/action-gh-release@v2.0.6
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.REF }}-run${{ github.run_number }}
           name: ${{ env.REF }}-run${{ github.run_number }}
-          files: ${{ github.workspace }}/main/Build/**/*
+          files: ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/FV/*
