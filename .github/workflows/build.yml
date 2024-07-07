@@ -9,11 +9,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: write
-    env:
-      TOOLCHAIN: CLANG9
-      build_target: RELEASE
-      stuart_opts: -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANG9 BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
-
+      
     steps:
       - name: Installing Dependencies and Updating System
         run: |
@@ -28,7 +24,7 @@ jobs:
           sudo apt update
           sudo apt upgrade
           
-          sudo apt install uuid-dev iasl nasm clang-format clang-tidy clang-tools clang clangd libc++-dev libc++1 libc++abi-dev libc++abi1 libclang-dev libclang1 libllvm-ocaml-dev libomp-dev libomp5 lld llvm-dev llvm-runtime llvm python3-clang
+          sudo apt install build-essential mono-complete uuid-dev iasl nasm clang-format clang-tidy clang-tools clang clangd libc++-dev libc++1 libc++abi-dev libc++abi1 libclang-dev libclang1 libllvm-ocaml-dev libomp-dev libomp5 lld llvm-dev llvm-runtime llvm python3-clang
 
       - name: Get Latest EDK-II Release
         run: |
@@ -42,31 +38,22 @@ jobs:
           path: main
           submodules: recursive
 
-      - name: Setup Dependencies
+      - name: Setup Build Environment
         working-directory: ${{ github.workspace }}/main
         run: |
+          echo "*venv*/**" >> .git/info/exclude
+          
           python -m venv .venv
           source .venv/bin/activate
-          pip install -r pip-requirements.txt --upgrade
-          python BaseTools/Edk2ToolsBuild.py -t "${toolchain}"
 
-      - name: Build OVMF
+          python BaseTools/Edk2ToolsBuild.py -t CLANGPDB
+
+          stuart_update -c .pytool/CISettings.py -a X64 -t CLANGPDB
+
+      - name: Build
         working-directory: ${{ github.workspace }}/main
         run: |
-          source .venv/bin/activate
-          stuart_setup ${stuart_opts} && stuart_update ${stuart_opts} && stuart_build ${stuart_opts}
-
-      - name: Create Release .tar.xz
-        working-directory: ${{ github.workspace }}
-        run: |
-          mkdir package
-          
-          cp main/Build/OvmfX64/RELEASE_CLANG9/FV/OVMF_CODE.fd package/
-          cp main/Build/OvmfX64/RELEASE_CLANG9/FV/OVMF_VARS.fd package/
-          cp main/Build/OvmfX64/RELEASE_CLANG9/X64/Shell.efi package/
-
-          tar cf package.tar package/
-          xz package.tar
+          stuart_ci_build -c .pytool/CISettings.py Target=RELEASE TOOL_CHAIN_TAG=CLANGPDB -p OvmfPkg/OvmfPkgX64.dsc -a X64 -t CLANGPDB
 
       - name: Create Release
         uses: softprops/action-gh-release@v2.0.6
@@ -75,4 +62,4 @@ jobs:
         with:
           tag_name: ${{ env.REF }}-run${{ github.run_number }}
           name: ${{ env.REF }}-run${{ github.run_number }}
-          files: ${{ github.workspace }}/package.tar.xz
+          files: ${{ github.workspace }}/main/Build/**/*
