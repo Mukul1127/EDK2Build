@@ -6,7 +6,8 @@ on:
 jobs:
   build:
     name: Build OVMF
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+    container: archlinux:latest
     permissions:
       contents: write    
       
