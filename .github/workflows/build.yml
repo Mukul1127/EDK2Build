@@ -16,7 +16,7 @@ jobs:
           sudo apt update
           sudo apt upgrade
           
-          sudo apt install nasm uuid-dev acpica-tools
+          sudo apt install mono-complete nasm uuid-dev acpica-tools
 
       - name: Checkout Repository
         uses: actions/checkout@v4.1.7
@@ -43,6 +43,8 @@ jobs:
       - name: Build
         working-directory: ${{ github.workspace }}/main
         run: |
+          source .venv/bin/activate
+          
           stuart_setup -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=GCC5 BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
           stuart_update -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=GCC5 BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
           stuart_build -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=GCC5 BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
