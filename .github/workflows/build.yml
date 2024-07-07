@@ -46,7 +46,7 @@ jobs:
 
           pip install -r pip-requirements.txt --upgrade
 
-          make -C -j $(nproc) BaseTools
+          python BaseTools/Edk2ToolsBuild.py -t GCC
           
           stuart_setup -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANGDWARF BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
           stuart_update -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANGDWARF BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
