@@ -16,7 +16,7 @@ jobs:
           sudo apt update
           sudo apt upgrade
           
-          sudo apt install nasm m4 bison flex uuid-dev unzip iasl gcc-multilib
+          sudo apt install nasm uuid-dev acpica-tools
 
       - name: Checkout Repository
         uses: actions/checkout@v4.1.7
