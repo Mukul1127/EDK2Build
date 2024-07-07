@@ -10,21 +10,17 @@ jobs:
     permissions:
       contents: write
     env:
-      TOOLCHAIN: CLANG9
+      TOOLCHAIN: GCC5
       build_target: RELEASE
-      stuart_opts: -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANG9 BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
+      stuart_opts: -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=GCC5 BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
 
     steps:
       - name: Installing Dependencies and Updating System
         run: |
-          curl -s https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor | sudo tee -a /usr/share/keyrings/llvm-archive-keyring.gpg
-
-          echo "deb [signed-by=/usr/share/keyrings/llvm-archive-keyring.gpg] http://apt.llvm.org/noble/ llvm-toolchain-noble main" | sudo tee -a /etc/apt/sources.list.d/llvm.list
-          
           sudo apt update
           sudo apt upgrade
           
-          sudo apt install uuid-dev iasl nasm clang-format clang-tidy clang-tools clang clangd libc++-dev libc++1 libc++abi-dev libc++abi1 libclang-dev libclang1 libllvm-ocaml-dev libomp-dev libomp5 lld llvm-dev llvm-runtime llvm python3-clang
+          sudo apt install uuid-dev iasl nasm gcc g++
 
       - name: Get Latest EDK-II Release
         run: |
