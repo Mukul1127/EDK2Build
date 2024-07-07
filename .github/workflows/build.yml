@@ -14,17 +14,7 @@ jobs:
     steps:
       - name: Install Dependencies and Update System
         run: |
-          pacman -Syu --noconfirm
-          pacman-key --init
-          
-          pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
-          pacman-key --lsign-key 3056513887B78AEB
-          pacman -U "https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst" --noconfirm
-          pacman -U "https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst" --noconfirm
-          echo "[chaotic-aur]"                              >> /etc/pacman.conf
-          echo "Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
-          
-          pacman -Syu jq git nasm acpica python make llvm-git lldb-git lld-git polly-git compiler-rt-git clang-git llvm-libs-git --noconfirm
+          pacman -Syu jq git nasm acpica python make gcc --noconfirm
 
       - name: Get Latest EDK-II Release
         run: |
@@ -48,13 +38,13 @@ jobs:
 
           python BaseTools/Edk2ToolsBuild.py -t GCC
           
-          stuart_setup -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANGDWARF BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
-          stuart_update -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANGDWARF BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
-          stuart_build -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANGDWARF BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
+          stuart_setup -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=GCC BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
+          stuart_update -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=GCC BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
+          stuart_build -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=GCC BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
 
       - name: Create Release
         uses: softprops/action-gh-release@v2.0.6
         with:
           tag_name: ${{ env.REF }}-run${{ github.run_number }}
           name: ${{ env.REF }}-run${{ github.run_number }}
-          files: ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/FV/*
+          files: ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_GCC/FV/*
