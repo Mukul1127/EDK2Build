@@ -27,7 +27,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt upgrade
-          sudo apt install uuid-dev iasl nasm python-is-python3
+          sudo apt install uuid-dev iasl nasm
 
       - name: Checkout Repository
         uses: actions/checkout@v4.1.7
