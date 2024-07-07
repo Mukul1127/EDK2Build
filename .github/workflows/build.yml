@@ -19,7 +19,11 @@ jobs:
         run: |
           curl -s https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor | sudo tee -a /usr/share/keyrings/llvm-archive-keyring.gpg
           
-          echo "deb [signed-by=/usr/share/keyrings/llvm-archive-keyring.gpg] http://apt.llvm.org/noble/ llvm-toolchain-noble main" | sudo tee -a /etc/apt/sources.list.d/llvm.list
+          echo "Types: deb"                                              | sudo tee -a /etc/apt/sources.list.d/llvm.sources
+          echo "URIs: http://apt.llvm.org/noble/"                        | sudo tee -a /etc/apt/sources.list.d/llvm.sources
+          echo "Suites: llvm-toolchain-noble"                            | sudo tee -a /etc/apt/sources.list.d/llvm.sources
+          echo "Components: main"                                        | sudo tee -a /etc/apt/sources.list.d/llvm.sources
+          echo "Signed-By: /usr/share/keyrings/llvm-archive-keyring.gpg" | sudo tee -a /etc/apt/sources.list.d/llvm.sources
           
           sudo apt update
           sudo apt upgrade
