@@ -25,7 +25,7 @@ jobs:
           echo "[chaotic-aur]"                              >> /etc/pacman.conf
           echo "Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
           
-          pacman -Syu nasm acpica python make llvm-git lldb-git lld-git polly-git compiler-rt-git clang-git llvm-ocaml-git llvm-libs-git --noconfirm
+          pacman -Syu nasm acpica python make llvm-git lldb-git lld-git polly-git compiler-rt-git clang-git llvm-libs-git --noconfirm
 
       - name: Get Latest EDK-II Release
         run: |
