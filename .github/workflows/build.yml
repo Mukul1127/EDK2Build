@@ -10,12 +10,7 @@ jobs:
     container: archlinux:latest
     permissions:
       contents: write
-    defaults:
-      run:
-        shell: bash
-        working-directory: ${{ github.workspace }}/main
 
-      
     steps:
       - name: Install Dependencies and Update System
         run: |
@@ -43,6 +38,8 @@ jobs:
           path: main
 
       - name: Build
+        shell: bash
+        working-directory: ${{ github.workspace }}/main
         run: |
           make -C BaseTools
           source edksetup.sh
