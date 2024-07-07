@@ -6,17 +6,15 @@ on:
 jobs:
   build:
     name: Build OVMF
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+    container: archlinux:latest
     permissions:
       contents: write
       
     steps:
-      - name: Installing Dependencies and Updating System
+      - name: Install Dependencies and Update System
         run: |
-          sudo apt update
-          sudo apt upgrade
-          
-          sudo apt install mono-complete nasm uuid-dev acpica-tools
+          sudo pacman -Syu nasm git acpica python
 
       - name: Checkout Repository
         uses: actions/checkout@v4.1.7
@@ -26,24 +24,15 @@ jobs:
           path: main
           submodules: recursive
 
-      - name: Setup Build Environment
+      - name: Build
         working-directory: ${{ github.workspace }}/main
         run: |
-          git submodule update --init --recursive
-          
-          echo "*venv*/**" >> .git/info/exclude
-          
           python -m venv .venv
           source .venv/bin/activate
 
           pip install -r pip-requirements.txt --upgrade
 
           python BaseTools/Edk2ToolsBuild.py -t GCC5
-
-      - name: Build
-        working-directory: ${{ github.workspace }}/main
-        run: |
-          source .venv/bin/activate
           
           stuart_setup -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=GCC5 BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
           stuart_update -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=GCC5 BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
