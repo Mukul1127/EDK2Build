@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Install Dependencies and Update System
         run: |
-          pacman -Syu
+          pacman -Syu --noconfirm
           
           pacman-key --init
           pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
