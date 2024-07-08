@@ -22,7 +22,7 @@ jobs:
           echo "Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
 
           pacman -Syu --noconfirm
-          pacman -S --noconfirm mono nasm jq git acpica python make llvm-git clang-git
+          pacman -S --noconfirm mono nasm jq git acpica python make llvm-git lld-git clang-git
 
       - name: Get Latest EDK-II Release
         run: |
