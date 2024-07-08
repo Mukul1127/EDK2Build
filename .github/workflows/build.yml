@@ -21,7 +21,7 @@ jobs:
           echo "[chaotic-aur]"                              >> /etc/pacman.conf
           echo "Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
 
-          pacman -Syu --noconfirm mono nasm jq git acpica python make llvm-git lld-git clang-git
+          pacman -Syu --noconfirm mono jq git python make llvm-git lld-git clang-git
 
       - name: Get Latest EDK-II Release
         run: |
@@ -50,6 +50,8 @@ jobs:
           stuart_build ${{ env.stuart_opts }}
         env:
           stuart_opts: -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANGDWARF BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
+          CC: clang
+          CXX: clang++
 
       - name: Create Release
         uses: softprops/action-gh-release@v2.0.6
