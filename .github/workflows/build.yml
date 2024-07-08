@@ -57,4 +57,4 @@ jobs:
           body: ${{ env.REF }} built with ${pacman -Q clang}
           tag_name: gh-actions-run${{ github.run_number }}
           name: ${{ env.REF }}
-          files: ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/FV/*.fd
+          files: ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/FV/OVMF_*.fd
