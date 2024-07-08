@@ -54,6 +54,6 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2.0.6
         with:
-          tag_name: gh-actions-run${{ github.run_number }}
+          body: ${{ env.REF }} built with ${pacman -Q clang}
           name: ${{ env.REF }}
           files: ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/FV/*.fd
