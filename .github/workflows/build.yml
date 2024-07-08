@@ -23,9 +23,10 @@ jobs:
 
           pacman -Syu --noconfirm mono jq git python make llvm-git lld-git clang-git
 
-      - name: Get Latest EDK-II Release
+      - name: Set Environment Variables
         run: |
           echo "REF=$(curl -s https://api.github.com/repos/tianocore/edk2/releases/latest | jq -r .tag_name)" >> $GITHUB_ENV
+          ehco "CLANG=$(pacman -Q clang)" >> $GITHUB_ENV
 
       - name: Checkout Repository
         uses: actions/checkout@v4.1.7
@@ -54,7 +55,7 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2.0.6
         with:
-          body: ${{ env.REF }} built with ${pacman -Q clang}
+          body: ${{ env.REF }} built with ${{ env.CLANG }}
           tag_name: gh-actions-run${{ github.run_number }}
           name: ${{ env.REF }}
           files: ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/FV/OVMF_*.fd
