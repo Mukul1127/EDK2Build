@@ -26,7 +26,7 @@ jobs:
       - name: Set Environment Variables
         run: |
           echo "REF=$(curl -s https://api.github.com/repos/tianocore/edk2/releases/latest | jq -r .tag_name)" >> $GITHUB_ENV
-          ehco "CLANG=$(pacman -Q clang)" >> $GITHUB_ENV
+          echo "CLANG=$(pacman -Q clang)" >> $GITHUB_ENV
 
       - name: Checkout Repository
         uses: actions/checkout@v4.1.7
