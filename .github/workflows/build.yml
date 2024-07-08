@@ -21,8 +21,7 @@ jobs:
           echo "[chaotic-aur]"                              >> /etc/pacman.conf
           echo "Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
 
-          pacman -Syu --noconfirm
-          pacman -S --noconfirm mono nasm jq git acpica python make llvm-git lld-git clang-git
+          pacman -Syu --noconfirm mono nasm jq git acpica python make llvm-git lld-git clang-git
 
       - name: Get Latest EDK-II Release
         run: |
@@ -55,8 +54,8 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2.0.6
         with:
-          tag_name: ${{ env.REF }}-run${{ github.run_number }}
-          name: ${{ env.REF }}-run${{ github.run_number }}
+          tag_name: gh-actions-run${{ github.run_number }}
+          name: ${{ env.REF }}
           files: |
             ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/FV/OVMF_CODE.fd
             ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/FV/OVMF_VARS.fd
