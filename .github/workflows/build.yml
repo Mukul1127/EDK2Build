@@ -24,7 +24,7 @@ jobs:
           echo "Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
 
           pacman -Syu --noconfirm
-          pacman -S --noconfirm mono jq git nasm acpica python make llvm-git lldb-git lld-git polly-git compiler-rt-git clang-git llvm-libs-git
+          pacman -S --noconfirm mono nasm jq git acpica python make llvm-git clang-git
 
       - name: Get Latest EDK-II Release
         run: |
@@ -57,4 +57,6 @@ jobs:
         with:
           tag_name: ${{ env.REF }}-run${{ github.run_number }}
           name: ${{ env.REF }}-run${{ github.run_number }}
-          files: ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/**/*
+          files: |
+            ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/FV/OVMF_CODE.fd
+            ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/FV/OVMF_VARS.fd
