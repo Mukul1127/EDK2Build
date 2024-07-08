@@ -56,6 +56,4 @@ jobs:
         with:
           tag_name: gh-actions-run${{ github.run_number }}
           name: ${{ env.REF }}
-          files: |
-            ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/FV/OVMF_CODE.fd
-            ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/FV/OVMF_VARS.fd
+          files: ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/FV/*.fd
