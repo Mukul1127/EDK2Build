@@ -11,8 +11,6 @@ jobs:
     permissions:
       contents: write
     env:
-      toolchain: CLANGDWARF
-      target: RELEASE
       stuart_opts: -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANGDWARF BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
 
     steps:
@@ -61,4 +59,4 @@ jobs:
         with:
           tag_name: ${{ env.REF }}-run${{ github.run_number }}
           name: ${{ env.REF }}-run${{ github.run_number }}
-          files: ${{ github.workspace }}/main/Build/OvmfX64/${{ env.target }}_${{ env.toolchain }}/**/*
+          files: ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/**/*
