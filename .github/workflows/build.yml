@@ -10,8 +10,6 @@ jobs:
     container: archlinux:latest
     permissions:
       contents: write
-    env:
-      stuart_opts: -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANGDWARF BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
 
     steps:
       - name: Install Dependencies and Update System
@@ -51,6 +49,8 @@ jobs:
           stuart_setup ${{ env.stuart_opts }}
           stuart_update ${{ env.stuart_opts }}
           stuart_build ${{ env.stuart_opts }}
+        env:
+          stuart_opts: -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANGDWARF BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
 
       - name: Create Release
         uses: softprops/action-gh-release@v2.0.6
