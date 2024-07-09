@@ -7,7 +7,7 @@ jobs:
   build:
     name: Build OVMF
     runs-on: ubuntu-latest
-    container: archlinux:latest
+    container: ghcr.io/archlinux/archlinux:latest
     permissions:
       contents: write
 
