@@ -12,7 +12,7 @@ jobs:
       contents: write
 
     steps:
-      - name: Install Dependencies and Update System
+      - name: 💾 Install Dependencies and Update System
         run: |
           pacman-key --init
           pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
@@ -23,20 +23,20 @@ jobs:
 
           pacman -Syu --noconfirm mono jq git python make llvm-git lld-git clang-git
 
-      - name: Set Environment Variables
+      - name: 🔧 Set Environment Variables
         run: |
           echo "REF=$(curl -s https://api.github.com/repos/tianocore/edk2/releases/latest | jq -r .tag_name)" >> $GITHUB_ENV
           echo "CLANG=$(pacman -Q clang)" >> $GITHUB_ENV
 
-      - name: Checkout Repository
-        uses: actions/checkout@v4.1.7
+      - name: 🚚 Check out the Repository
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           repository: tianocore/edk2
           ref: ${{ env.REF }}
           path: main
           submodules: recursive
 
-      - name: Build
+      - name: 📦 Build
         working-directory: ${{ github.workspace }}/main
         run: |
           python -m venv .venv
@@ -52,8 +52,8 @@ jobs:
         env:
           stuart_opts: -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANGDWARF BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v2.0.6
+      - name: 🚀 Publish Release
+        uses: softprops/action-gh-release@a74c6b72af54cfa997e81df42d94703d6313a2d0 # v2.0.6
         with:
           body: ${{ env.REF }} built with ${{ env.CLANG }}
           tag_name: gh-actions-run${{ github.run_number }}
