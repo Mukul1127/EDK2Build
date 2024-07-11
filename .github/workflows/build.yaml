@@ -21,7 +21,7 @@ jobs:
           echo "[chaotic-aur]"                              >> /etc/pacman.conf
           echo "Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
 
-          pacman -Syu --noconfirm mono jq git python make llvm-git lld-git clang-git
+          pacman -Syu --noconfirm mono jq git python make llvm-git lld-git clang-git github-cli
 
       - name: 🔧 Set Environment Variables
         run: |
@@ -37,7 +37,7 @@ jobs:
           submodules: recursive
 
       - name: 📦 Build
-        working-directory: ${{ github.workspace }}/main
+        working-directory: main
         run: |
           python -m venv .venv
           source .venv/bin/activate
@@ -53,11 +53,8 @@ jobs:
           stuart_opts: -c OvmfPkg/PlatformCI/PlatformBuild.py -a X64 Target=RELEASE TOOL_CHAIN_TAG=CLANGDWARF BLD_*_NETWORK_HTTP_ENABLE=1 BLD_*_TPM1_ENABLE=1 BLD_*_TPM2_ENABLE=1
 
       - name: 🚀 Publish Release
-        uses: softprops/action-gh-release@a74c6b72af54cfa997e81df42d94703d6313a2d0 # v2.0.6
-        with:
-          body: ${{ env.REF }} built with ${{ env.CLANG }}
-          tag_name: gh-actions-run${{ github.run_number }}
-          name: ${{ env.REF }}
-          files: |
-            ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/FV/OVMF_*.fd
-            ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/X64/Shell*.efi
+        working-directory: main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create gh-actions-run${{ github.run_number }} Build/OvmfX64/RELEASE_CLANGDWARF/FV/OVMF_CODE.fd Build/OvmfX64/RELEASE_CLANGDWARF/FV/OVMF_VARS.fd Build/OvmfX64/RELEASE_CLANGDWARF/X64/Shell.efi -t "${{ env.REF }}" -n "${{ env.REF }} built with ${{ env.CLANG }}"
