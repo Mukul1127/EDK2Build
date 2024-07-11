@@ -60,4 +60,4 @@ jobs:
           name: ${{ env.REF }}
           files: |
             ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/FV/OVMF_*.fd
-            ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/X64/Shell.efi
+            ${{ github.workspace }}/main/Build/OvmfX64/RELEASE_CLANGDWARF/X64/Shell*.efi
