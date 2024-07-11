@@ -23,10 +23,8 @@ jobs:
 
           pacman -Syu --noconfirm mono jq git python make llvm-git lld-git clang-git github-cli
 
-      - name: 🔧 Set Environment Variables
-        run: |
-          echo "REF=$(curl -s https://api.github.com/repos/tianocore/edk2/releases/latest | jq -r .tag_name)" >> $GITHUB_ENV
-          echo "CLANG=$(pacman -Q clang)" >> $GITHUB_ENV
+      - name: 🔧 Get Latest EDK-II Release
+        run: echo "REF=$(curl -s https://api.github.com/repos/tianocore/edk2/releases/latest | jq -r .tag_name)" >> $GITHUB_ENV
 
       - name: 🚚 Check out the Repository
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
@@ -54,7 +52,6 @@ jobs:
 
       - name: 🚀 Publish Release
         working-directory: main
+        run: gh release create gh-actions-run${{ github.run_number }} Build/OvmfX64/RELEASE_CLANGDWARF/FV/OVMF_CODE.fd Build/OvmfX64/RELEASE_CLANGDWARF/FV/OVMF_VARS.fd Build/OvmfX64/RELEASE_CLANGDWARF/X64/Shell.efi -t ${{ env.REF }} -n "${{ env.REF }} built with $(pacman -Q clang)" -R ${{ github.repository }}
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create gh-actions-run${{ github.run_number }} Build/OvmfX64/RELEASE_CLANGDWARF/FV/OVMF_CODE.fd Build/OvmfX64/RELEASE_CLANGDWARF/FV/OVMF_VARS.fd Build/OvmfX64/RELEASE_CLANGDWARF/X64/Shell.efi -t "${{ env.REF }}" -n "${{ env.REF }} built with ${{ env.CLANG }}"
