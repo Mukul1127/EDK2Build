@@ -42,6 +42,7 @@ jobs:
           python -m venv .venv
           source .venv/bin/activate
 
+          pip install --upgrade pip
           pip install -r pip-requirements.txt --upgrade
 
           python BaseTools/Edk2ToolsBuild.py -t GCC
